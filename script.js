@@ -1,3 +1,5 @@
+var audioArray = null;
+
 var root = {
   wavecolor: {  
     r: 125,
@@ -65,8 +67,9 @@ function draw() {
         }
 
         ctx.fillText(text, i * font_size, drops[i] * font_size);
-        // Incrementing Y coordinate
-        drops[i]++;
+        // Apply the speed change based on the audio data
+        drops[i] += root.matrixspeed / (audioArray.length / columns);
+
         // sending the drop back to the top randomly after it has crossed the screen
         // adding randomness to the reset to make the drops scattered on the Y axis
        if (drops[i] * font_size > c.height && Math.random() > 0.975)
@@ -76,6 +79,10 @@ function draw() {
 
 setInterval(draw, root.matrixspeed);
 
+function livelyAudioListener(audioArray) {
+  // Copy the audio data into the global variable
+  audioArray = audioArray;
+}
 
 function livelyPropertyListener(name, val)
 {
@@ -88,7 +95,12 @@ function livelyPropertyListener(name, val)
       break;   
     case "rainbowSpeed":
       root.rainbowSpeed = val/100;
-      break;     
+      break;
+    case "matrixSpeed":
+      root.matrixspeed = val;
+      clearInterval(intervalId);
+      intervalId = setInterval(draw, root.matrixspeed);        
+      break;
   }
 }
 
